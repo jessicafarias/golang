@@ -4,9 +4,13 @@ import (
 	"fmt"
 	"math"
 	"os"
+	"p/log"
+	"runtime"
 	"sync"
 	"text/tabwriter"
 	"time"
+
+	// "github.com/aws/aws-lambda-go/lambda"
 )
 
 // type Counter struct {
@@ -20,6 +24,15 @@ import (
 // }
 
 func main(){
+	// lambda.Start(a)
+	a()
+}
+func getGOMAXPROCS() int {
+    return runtime.GOMAXPROCS(0)
+}
+func a(){
+	runtime.GOMAXPROCS(1)
+	fmt.Printf("GOMAXPROCS is %d\n", getGOMAXPROCS())
 	producer := func(wg *sync.WaitGroup, l sync.Locker) {
 		defer wg.Done()
 		for i := 5; i > 0; i-- {
@@ -43,10 +56,12 @@ func main(){
 		for i := count; i > 0; i-- {
 			go observer(&wg, rwMutex)
 		}
-	
+		log.Debug(count)
+		
 		wg.Wait()
 		return time.Since(beginTestTime)
 	}
+
 	
 	tw := tabwriter.NewWriter(os.Stdout, 0, 1, 2, ' ', 0)
 	defer tw.Flush()

@@ -4,12 +4,22 @@ import (
 	"fmt"
 	"runtime"
 	"sync"
+	"github.com/aws/aws-lambda-go/lambda"
 )
 
-// We need to use mutex for the shared variable don't get corrupted
+func main(){	
+	lambda.Start(test)
 
-func main() {
-	runtime.GOMAXPROCS(3)
+}
+
+// We need to use mutex for the shared variable don't get corrupted
+func getGOMAXPROCS() int {
+    return runtime.GOMAXPROCS(0)
+}
+
+func test() {
+	fmt.Printf("GOMAXPROCS is %d\n", getGOMAXPROCS())
+	runtime.GOMAXPROCS(2)
 	var balance int
 	var wg sync.WaitGroup
 
